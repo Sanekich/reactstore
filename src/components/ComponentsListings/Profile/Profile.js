@@ -260,7 +260,7 @@ const handleTaskFinish = async () => {
             <li><a href="/profile">Профіль</a></li>
             <li><a href="/services">Послуги</a></li>
             <li><a href="/contacts">Контакти</a></li>
-            <li><a href="/">Повернутись</a></li>
+            <li><a href="/reactstore">Повернутись</a></li>
           </ul>
         </div>
       </div>

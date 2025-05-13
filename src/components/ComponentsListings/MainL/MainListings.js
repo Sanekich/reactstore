@@ -161,7 +161,7 @@ const handleAcceptTask = async (taskId) => {
             <li><a href="/profile">Профіль</a></li>
             <li><a href="#">Послуги</a></li>
             <li><a href="#">Контакти</a></li>
-            <li><a href="/">Повернутись</a></li>
+            <li><a href="/reactstore">Повернутись</a></li>
           </ul>
         </div>
       </div>
