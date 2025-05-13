@@ -1,0 +1,228 @@
+body {
+    background: #000;
+    color: white;
+}
+
+.header {
+  background: rgba(0, 0, 0, 0.9);
+  padding: 1rem;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow: visible;
+}
+
+.nav {
+  max-width: 1200px;  
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1001;
+  overflow: visible;
+  position: relative;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 15px;
+  position: relative;
+  z-index: 1002;
+}
+
+.logo {
+    width: 100px;
+    height: 100px; 
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links button {
+    justify-self: center;
+    text-decoration: none;
+    color: white;
+    background-color: #000;
+    border: none;
+    font-size: 16px;
+    transition: color 0.3s;
+    text-transform: uppercase;
+    transition: 0.3s ease-in-out;
+}
+
+.nav-links button:hover {
+    color: #4acbe2;
+    transform: scale(1.1);
+}
+
+.button {
+    background: #4a90e2;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    text-transform: uppercase;
+}
+
+.button:hover {
+    background: #357abd;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.username {
+    color: white;
+    font-weight: bold;
+}
+
+.logout-button {
+    background: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.logout-button:hover {
+    background: #c0392b;
+}
+
+.hero {
+    height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                url('https://via.placeholder.com/1920x1080') center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: 1.5rem;
+    margin-bottom: 40px; 
+}
+
+.section {
+    padding: 80px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.sectionTest {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.service-card {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.service-card img {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 20px;
+}
+
+.testimonials {
+    background: #1a1a1a;
+    margin-bottom: 40px;
+}
+
+.testimonial-card {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.policy {
+    background: #2c2b2b;
+    margin: 10px 0;
+    height: 200px;  
+    position: relative;
+    top: 20px;
+}
+
+.GetStarted {
+    background: #27292c;
+    border: 2px solid white;
+    color: white;
+    padding: 10px 20px; 
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+.GetStarted:hover{
+    transform:  scale(1.05);
+}
+
+.GetStarted a {
+    color: white;
+    display: inline-block;
+    transition: transform 0.3s ease-in-out;
+    text-decoration: none;
+    position: relative;
+    left: 6px;
+}
+
+.GetStarted::after {
+    content: "→";
+    position: relative;
+    right: -20px;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.GetStarted:hover a {
+    transform: translateX(-10px);
+}
+
+.GetStarted:hover::after {
+    right: -5px;
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+}
