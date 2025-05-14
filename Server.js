@@ -28,6 +28,15 @@ db.run(`
     } 
   });
 
+db.all(`PRAGMA table_info(listings)`, (err, cols) => {
+  if (err) throw err;
+  
+  if (!cols.some(c => c.name === 'visibility')) {
+    db.run(`ALTER TABLE listings ADD COLUMN visibility INTEGER NOT NULL DEFAULT 1`);
+  }
+});
+
+
 
 db.run(`
   CREATE TABLE IF NOT EXISTS users (
@@ -89,13 +98,19 @@ app.get('/api/messages/:senderId/:receiverId', (req, res) => {
 });
 
 
-// Get all listings
 app.get('/api/listings', (req, res) => {
-  db.all('SELECT * FROM listings', (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
+  db.all(
+    'SELECT * FROM listings WHERE visibility = 1',
+    (err, rows) => {
+      if (err) {
+        console.error('DB error fetching listings:', err.message);
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(rows);
+    }
+  );
 });
+
 
 app.post('/api/CreateListing', (req, res) => {
   const { title, description, city, country, price, username } = req.body;
@@ -122,7 +137,6 @@ app.post('/api/CreateListing', (req, res) => {
 });
 
 
-// Register 
 app.post('/api/register', (req, res) => {
   const { name, email, password } = req.body;
 
@@ -221,7 +235,6 @@ app.get('/api/getUserIdByName/:username', (req, res) => {
 });
 
 
-// Get user by ID (including profile picture)
 app.get('/api/users/:id', (req, res) => {
   const { id } = req.params;
 
@@ -245,7 +258,6 @@ app.post('/api/acceptTask', (req, res) => {
       if (err) return res.status(500).json({ error: err.message });
       if (!listing) return res.status(404).json({ error: 'Listing not found' });
 
-      // listing.username now holds the correct value
       db.run(
         'UPDATE users SET current_task_id = ? WHERE id = ?',
         [taskId, userId],
@@ -254,16 +266,24 @@ app.post('/api/acceptTask', (req, res) => {
           if (this.changes === 0)
             return res.status(404).json({ error: 'User not found' });
 
-          // send it back exactly as "username"
-          res.json({
-            message: 'Task accepted successfully',
-            username: listing.username
-          });
+          db.run(
+            'UPDATE listings SET visibility = 0 WHERE id = ?',
+            [taskId],
+            function(visibilityErr) {
+              if (visibilityErr) return res.status(500).json({ error: visibilityErr.message });
+
+              res.json({
+                message: 'Task accepted successfully',
+                username: listing.username
+              });
+            }
+          );
         }
       );
     }
   );
 });
+
 
 
 
@@ -274,7 +294,6 @@ app.post('/api/completeTask', (req, res) => {
     return res.status(400).json({ error: 'userId is required' });
   }
 
-  // 1) Find current_task_id
   db.get(
     'SELECT current_task_id FROM users WHERE id = ?',
     [userId],
@@ -289,7 +308,6 @@ app.post('/api/completeTask', (req, res) => {
           .json({ error: 'User has no active task to complete' });
       }
 
-      // 2) Delete the listing
       db.run(
         'DELETE FROM listings WHERE id = ?',
         [taskId],
@@ -301,7 +319,6 @@ app.post('/api/completeTask', (req, res) => {
 
           console.log(`Deleted ${this.changes} listing(s) with id ${taskId}`);
 
-          // 3) Clear the user's current_task_id
           db.run(
             'UPDATE users SET current_task_id = NULL WHERE id = ?',
             [userId],
@@ -324,10 +341,7 @@ app.post('/api/completeTask', (req, res) => {
 });
 
 
-
-
-// Get a single listing by ID
-app.get('/api/listings/:id', (req, res) => {
+app.get('/api/GetCurrentListing/:id', (req, res) => {
   const { id } = req.params;
 
   db.get('SELECT * FROM listings WHERE id = ?', [id], (err, row) => {
@@ -344,6 +358,5 @@ app.get('/api/listings/:id', (req, res) => {
 
 
 
-// Server configuration
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

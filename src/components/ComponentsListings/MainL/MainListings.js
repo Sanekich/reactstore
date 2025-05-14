@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './styles.css';
 
@@ -15,26 +15,37 @@ const ListingsPage = () => {
   });
   const [currentUser, setCurrentUser] = useState(null);
   const [menuActive, setMenuActive] = useState(false); 
+  const [acceptedTaskId, setAcceptedTaskId] = useState(null);
   const [allListingsActive, setAllListingsActive] = useState(false); 
   const [circleButtonActive, setCircleButtonActive] = useState(false);
 
+    const fetchListings = useCallback(async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/listings');
+      const data = await res.json();
+      setListings(data);
+    } catch (err) {
+      console.error('Помилка завантаження оголошень:', err);
+    }
+  }, []);
+
   useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/listings');
-        const data = await res.json();
-        setListings(data);
-      } catch (err) {
-        console.error('Помилка завантаження оголошень:', err);
-      }
-    };
     fetchListings();
 
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser?.name) {
       setCurrentUser(storedUser.name);
     }
-  }, []);
+
+    if (localStorage.getItem('hasAcceptedTask') === '1') {
+      setAcceptedTaskId('alreadyAccepted');
+    }
+  }, [fetchListings]);
+
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
 
   const handleAddListingClick = () => {
     setShowModal(true);
@@ -57,10 +68,9 @@ const handleSubmit = async (e) => {
     return alert('Будь ласка, увійдіть перед створенням оголошення');
   }
 
-  // include username in payload
   const payload = {
     ...formData,
-    price: Number(formData.price),      // ensure it's a number
+    price: Number(formData.price),      
     username: storedUser.name
   };
 
@@ -100,36 +110,39 @@ const handleSubmit = async (e) => {
     setCircleButtonActive(prevState => !prevState);
   };
 
-const handleAcceptTask = async (taskId) => {
-  const storedUser = JSON.parse(localStorage.getItem('user'));
-  if (!storedUser?.id) return alert('Будь ласка, увійдіть');
+  const handleAcceptTask = async (taskId) => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (!storedUser?.id) return alert('Будь ласка, увійдіть');
 
-  try {
-    const res = await fetch('http://localhost:5000/api/acceptTask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: storedUser.id, taskId })
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || 'Unknown error');
+    if (localStorage.getItem('hasAcceptedTask') === '1') {
+      return alert('Ви вже прийняли завдання');
     }
 
-    
-    localStorage.setItem('taskOwner', JSON.stringify(data.username));
+    try {
+      const res = await fetch('http://localhost:5000/api/acceptTask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: storedUser.id, taskId })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Unknown error');
 
-  } catch (err) {
-    console.error('Помилка при прийнятті завдання:', err);
-    alert('Не вдалося прийняти завдання: ' + err.message);
-  }
-};
+      localStorage.setItem('hasAcceptedTask', '1');
+      localStorage.setItem('taskOwner', JSON.stringify(data.username));
+
+      await fetchListings();
+
+    } catch (err) {
+      console.error('Помилка при прийнятті завдання:', err);
+      alert('Не вдалося прийняти завдання: ' + err.message);
+    }
+  };
+
 
   return (
     <div>
       <header className="header">
         <nav className="nav">
-          <p>Залишилось оголошень: {listings.length}</p>
           <div className="user">
             {currentUser ? (
               <div className="user-info">
@@ -156,15 +169,14 @@ const handleAcceptTask = async (taskId) => {
 
       <div id="rightMenu" className={`right-menu ${menuActive ? 'active' : ''}`}>
         <div className="menu-content">
-          <ul>
-            <li><a href="/listings">Головна</a></li>
-            <li><a href="/profile">Профіль</a></li>
-            <li><a href="#">Послуги</a></li>
-            <li><a href="#">Контакти</a></li>
-            <li><a href="/reactstore">Повернутись</a></li>
-          </ul>
+          <button onClick={() => handleNavigation('/listings')}>Головна</button>
+          <button onClick={() => handleNavigation('/profile')}>Профіль</button>
+          <button onClick={() => handleNavigation('/services')}>Послуги</button>
+          <button onClick={() => handleNavigation('/contacts')}>Контакти</button>
+          <button onClick={() => handleNavigation('/reactstore')}>Повернутись</button>
         </div>
       </div>
+
 
       <div className="content">
         <div id="listings" className="listings-container">
@@ -177,7 +189,7 @@ const handleAcceptTask = async (taskId) => {
               <p>{listing.description}</p>
               <p>Місто: {listing.city}, {listing.country}</p>
               <p>Ціна: €{listing.price}/год</p>
-              <button className="button" onClick={() => handleAcceptTask(listing.id)}>
+              <button className="button" onClick={() => handleAcceptTask(listing.id)} disabled={localStorage.getItem('hasAcceptedTask') === '1'}>
                 Прийняти
               </button>
             </div>

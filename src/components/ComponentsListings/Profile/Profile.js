@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './styles.css';
 
 const ChatWindow = ({ onClose, recipient }) => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const currentUser = JSON.parse(localStorage.getItem('user'));
@@ -19,7 +20,6 @@ const ChatWindow = ({ onClose, recipient }) => {
       .catch(err => console.error("Failed to get recipient ID:", err));
   }, [recipient]);
 
-  // Load messages between sender and recipient
   useEffect(() => {
     if (!senderId || !receiverId) return;
     fetch(`http://localhost:5000/api/messages/${senderId}/${receiverId}`)
@@ -27,6 +27,7 @@ const ChatWindow = ({ onClose, recipient }) => {
       .then(data => setMessages(data))
       .catch(err => console.error("Error loading messages:", err));
   }, [senderId, receiverId]);
+
 
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
@@ -113,7 +114,9 @@ const Profile = () => {
   };
   const closeChat = () => setShowChat(false);
 
-
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
 
   const fetchUserData = (id) => {
     fetch(`http://localhost:5000/api/users/${id}`)
@@ -169,11 +172,15 @@ const handleTaskFinish = async () => {
 
     setCurrentTaskId(null);
     setCurrentListing(null);
+    localStorage.setItem('hasAcceptedTask', '0');
+    localStorage.removeItem('taskOwner');
+
   } catch (error) {
     console.error('Error finishing task:', error);
     alert('Error finishing task: ' + error.message);
   }
 };
+
 
 
   const handleDescriptionUpdate = async () => {
@@ -212,7 +219,7 @@ const handleTaskFinish = async () => {
 
   useEffect(() => {
     if (!currentTaskId) return;
-    fetch(`http://localhost:5000/api/listings/${currentTaskId}`)
+    fetch(`http://localhost:5000/api/GetCurrentListing/${currentTaskId}`)
       .then(res => {
         if (res.status === 404) return null;
         if (!res.ok) throw new Error(res.statusText);
@@ -255,15 +262,14 @@ const handleTaskFinish = async () => {
 
       <div id="rightMenu" className={`right-menu ${menuActive ? 'active' : ''}`}>
         <div className="menu-content">
-          <ul>
-            <li><a href="/listings">Головна</a></li>
-            <li><a href="/profile">Профіль</a></li>
-            <li><a href="/services">Послуги</a></li>
-            <li><a href="/contacts">Контакти</a></li>
-            <li><a href="/reactstore">Повернутись</a></li>
-          </ul>
+          <button onClick={() => handleNavigation('/listings')}>Головна</button>
+          <button onClick={() => handleNavigation('/profile')}>Профіль</button>
+          <button onClick={() => handleNavigation('/services')}>Послуги</button>
+          <button onClick={() => handleNavigation('/contacts')}>Контакти</button>
+          <button onClick={() => handleNavigation('/reactstore')}>Повернутись</button>
         </div>
       </div>
+
 
       <div className="Top">
         <div className="ProfilePicture">

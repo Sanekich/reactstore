@@ -52,33 +52,30 @@
     color: #4acbe2;
 }
 
-.menu-content ul {
-    list-style: none;
-    margin-top: -20px;
-    justify-items: right;
+.menu-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between buttons */
 }
 
-.menu-content ul li {
-    margin-bottom: 15px;
-    margin-bottom: 20px;
-    transition: 0.3s ease-in-out;
-}
-
-.menu-content ul li a {
+.menu-content button {
     color: white;
-    text-decoration: none;
-    transition: color 0.3s;
+    background: none;
+    border: none;
     font-size: 20px;
-
+    cursor: pointer;
+    text-align: left;
+    transition: color 0.3s;
 }
 
-.menu-content ul li a:hover {
+.menu-content button:hover {
     color: #4acbe2;
 }
 
-.menu-content ul li:hover{
+.menu-content button:active {
     transform: scale(1.1);
 }
+
 
 .menu-toggle {
     background: none;

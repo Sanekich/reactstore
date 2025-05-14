@@ -313,29 +313,28 @@
     margin-right: 50px;
   }
   
-  .menu-content ul {
-    list-style: none;
-    padding: 0;
-    margin-top: -20px;
-  }
-  
-  .menu-content ul li {
-    margin-bottom: 20px;
-    transition: transform 0.3s ease-in-out;
-  }
-  
-  .menu-content ul li a {
+.menu-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between buttons */
+}
+
+.menu-content button {
     color: white;
-    text-decoration: none;
+    background: none;
+    border: none;
     font-size: 20px;
+    cursor: pointer;
+    text-align: left;
     transition: color 0.3s;
-  }
-  
-  .menu-content ul li a:hover {
+}
+
+.menu-content button:hover {
     color: #4acbe2;
-  }
-  
-  .menu-content ul li:hover {
+}
+
+.menu-content button:active {
     transform: scale(1.1);
-  }
+}
+
   
