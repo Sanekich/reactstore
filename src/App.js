@@ -9,7 +9,7 @@ import Profile from './components/ComponentsListings/Profile/Profile.js';
   
 function App() {
   return (
-    <Router>
+    <Router basename="/reactstore">
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/services" element={<Services />} />
